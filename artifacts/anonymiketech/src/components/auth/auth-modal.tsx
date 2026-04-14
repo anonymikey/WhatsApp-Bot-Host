@@ -481,14 +481,6 @@ export function AuthModal({ open, onOpenChange, mode }: AuthModalProps) {
                   </button>
                 </div>
 
-                <button
-                  onClick={handleReplit}
-                  className="w-full flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ReplitIcon className="w-3.5 h-3.5" />
-                  Continue with Replit
-                </button>
-
                 <p className="mt-4 text-xs text-center text-muted-foreground border-t border-white/5 pt-4">
                   {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
                   <button
