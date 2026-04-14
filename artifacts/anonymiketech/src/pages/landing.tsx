@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { DeployBotModal } from "@/components/bots/deploy-bot-modal";
 import { Footer } from "@/components/layout/footer";
+import { PartnerCTASection } from "@/components/layout/partner-cta-section";
 import { FEATURED_BOT, OTHER_BOTS, type BotDefinition } from "@/data/bots-catalog";
 
 const COIN_PACKAGES = [
@@ -412,6 +413,9 @@ export default function Landing() {
             </div>
           </motion.div>
         </section>
+
+        {/* Partner CTA */}
+        <PartnerCTASection />
 
         {/* Footer always inside z-10 so it's visible */}
         <Footer />

@@ -8,6 +8,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { PartnerCTASection } from "@/components/layout/partner-cta-section";
 
 const CATEGORIES = [
   { id: "all", label: "All Bots" },
@@ -266,6 +267,7 @@ export default function BotsPage() {
       <DeployBotModal bot={selectedBot} open={deployOpen} onOpenChange={setDeployOpen} />
       <AuthModal open={authModal === "sign-in"} onOpenChange={(o) => setAuthModal(o ? "sign-in" : null)} mode="sign-in" />
       <AuthModal open={authModal === "sign-up"} onOpenChange={(o) => setAuthModal(o ? "sign-up" : null)} mode="sign-up" />
+      <PartnerCTASection />
       <Footer />
     </div>
   );

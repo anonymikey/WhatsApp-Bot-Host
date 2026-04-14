@@ -15,6 +15,7 @@ import PricingPage from "@/pages/pricing";
 import ContactPage from "@/pages/contact";
 import AdminPage from "@/pages/admin";
 import NotFound from "@/pages/not-found";
+import { PartnerFloatingWidget } from "@/components/layout/partner-floating-widget";
 
 const queryClient = new QueryClient();
 
@@ -44,9 +45,7 @@ function Router() {
           <Route path="/bots">
             <ProtectedRoute><BotsPage /></ProtectedRoute>
           </Route>
-          <Route path="/partners">
-            <ProtectedRoute><PartnersPage /></ProtectedRoute>
-          </Route>
+          <Route path="/partners" component={PartnersPage} />
           <Route path="/profile">
             <ProtectedRoute><ProfilePage /></ProtectedRoute>
           </Route>
@@ -69,6 +68,7 @@ function App() {
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <Router />
         </WouterRouter>
+        <PartnerFloatingWidget />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

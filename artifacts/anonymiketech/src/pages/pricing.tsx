@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Coins, Zap, CheckCircle2, Star, Bot, Shield, Clock, MessageCircle } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { PartnerCTASection } from "@/components/layout/partner-cta-section";
 import { BuyCoinsModal } from "@/components/coins/buy-coins-modal";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useState } from "react";
@@ -412,6 +413,7 @@ export default function PricingPage() {
       </div>
 
       <BuyCoinsModal open={buyOpen} onClose={() => setBuyOpen(false)} />
+      <PartnerCTASection />
       <Footer />
     </div>
   );
