@@ -11,16 +11,19 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           {/* Brand */}
           <div>
-            <div className="flex flex-col items-start mb-3">
+            <div className="flex items-center gap-2 mb-3">
               <img
                 src={logoImg}
-                alt="ANONYMIKETECH"
-                className="h-14 w-auto object-contain mb-1"
+                alt="Logo"
+                className="h-8 w-8 object-contain rounded-lg flex-shrink-0"
                 style={{ imageRendering: "high-quality" }}
               />
-              <span className="text-[9px] font-semibold tracking-[0.22em] uppercase mt-0.5 whitespace-nowrap" style={{ color: "#00e599", opacity: 0.7 }}>
-                Rock &amp; Roll
-              </span>
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-sm" style={{ color: "#e4e4e7" }}>ANONYMIKETECH</span>
+                <span className="text-[8px] font-semibold tracking-[0.20em] uppercase mt-0.5 whitespace-nowrap" style={{ color: "#00e599", opacity: 0.7 }}>
+                  Rock &amp; Roll
+                </span>
+              </div>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: "#71717a" }}>
               Kenya's leading WhatsApp bot hosting platform. Deploy, manage, and scale bots effortlessly.

@@ -64,14 +64,18 @@ export default function Landing() {
 
         {/* Navigation */}
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 w-full h-16 sm:h-20 flex items-center justify-between gap-3">
-          <div className="flex items-center flex-shrink-0">
-            <div className="flex flex-col items-center leading-none">
-              <img
-                src={logoImg}
-                alt="ANONYMIKETECH"
-                className="h-9 sm:h-11 w-auto object-contain"
-                style={{ imageRendering: "high-quality" }}
-              />
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <img
+              src={logoImg}
+              alt="Logo"
+              className="h-9 sm:h-10 w-9 sm:w-10 object-contain rounded-xl flex-shrink-0"
+              style={{ imageRendering: "high-quality" }}
+            />
+            <div className="flex flex-col leading-none">
+              <span className="font-display font-bold tracking-widest text-foreground">
+                <span className="text-sm sm:hidden">AMT</span>
+                <span className="hidden sm:inline text-xl">ANONYMIKETECH</span>
+              </span>
               <span className="text-[7px] sm:text-[9px] font-semibold tracking-[0.22em] text-primary/70 uppercase mt-0.5 whitespace-nowrap">
                 Rock &amp; Roll
               </span>

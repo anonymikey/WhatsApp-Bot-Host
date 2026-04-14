@@ -62,14 +62,18 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
 
           {/* Brand */}
-          <Link href="/" className="flex items-center flex-shrink-0 group">
-            <div className="flex flex-col items-center leading-none">
-              <img
-                src={logoImg}
-                alt="ANONYMIKETECH"
-                className="h-9 sm:h-11 w-auto object-contain group-hover:opacity-90 transition-opacity"
-                style={{ imageRendering: "high-quality" }}
-              />
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+            <img
+              src={logoImg}
+              alt="Logo"
+              className="h-9 sm:h-10 w-9 sm:w-10 object-contain rounded-xl group-hover:opacity-90 transition-opacity flex-shrink-0"
+              style={{ imageRendering: "high-quality" }}
+            />
+            <div className="flex flex-col leading-none">
+              <span className="font-display font-bold tracking-widest text-foreground">
+                <span className="text-sm sm:hidden">AMT</span>
+                <span className="hidden sm:inline text-xl">ANONYMIKETECH</span>
+              </span>
               <span className="text-[7px] sm:text-[9px] font-semibold tracking-[0.22em] text-primary/70 uppercase mt-0.5 whitespace-nowrap">
                 Rock &amp; Roll
               </span>
