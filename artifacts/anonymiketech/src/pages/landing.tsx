@@ -66,12 +66,14 @@ export default function Landing() {
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
               <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display font-bold tracking-widest text-foreground">
-                <span className="text-base sm:hidden">AMT</span>
-                <span className="hidden sm:inline text-xl">ANONYMIKETECH</span>
+            <div className="flex flex-col items-center justify-center text-center leading-none">
+              <span className="font-display font-bold tracking-widest text-foreground text-base sm:text-xl">
+                <span className="sm:hidden">AMT</span>
+                <span className="hidden sm:inline">ANONYMIKETECH</span>
               </span>
-              <span className="hidden sm:block text-[9px] font-semibold tracking-[0.2em] text-primary/70 uppercase mt-0.5">Rock &amp; Roll</span>
+              <span className="text-[8px] sm:text-[9px] md:text-[10px] font-semibold tracking-[0.22em] text-primary/70 uppercase mt-0.5 whitespace-nowrap">
+                Rock &amp; Roll
+              </span>
             </div>
           </div>
 
