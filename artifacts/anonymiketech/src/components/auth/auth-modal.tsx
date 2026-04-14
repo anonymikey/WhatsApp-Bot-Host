@@ -347,14 +347,14 @@ export function AuthModal({ open, onOpenChange, mode }: AuthModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) resetForm(); }}>
-      <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border border-white/10 bg-background shadow-2xl">
+      <DialogContent className="w-[calc(100%-2rem)] sm:w-auto sm:max-w-[420px] max-h-[90dvh] overflow-y-auto p-0 border border-white/10 bg-background shadow-2xl rounded-2xl">
         <DialogTitle className="sr-only">
           {verifyEmail ? "Verify your email" : isSignUp ? "Create your account" : "Sign in to your account"}
         </DialogTitle>
 
-        <div className="h-0.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
+        <div className="h-0.5 w-full flex-shrink-0 bg-gradient-to-r from-primary via-accent to-primary" />
 
-        <div className="px-7 py-7">
+        <div className="px-5 py-5 sm:px-7 sm:py-7">
           <AnimatePresence mode="wait">
             {verifyEmail ? (
               <VerifyStep
