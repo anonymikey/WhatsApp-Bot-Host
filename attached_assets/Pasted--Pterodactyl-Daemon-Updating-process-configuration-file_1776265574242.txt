@@ -1,0 +1,73 @@
+[Pterodactyl Daemon]: Updating process configuration files...
+[Pterodactyl Daemon]: Ensuring file permissions are set correctly, this could take a few seconds...
+container@pterodactyl~ Server marked as starting...
+[Pterodactyl Daemon]: Pulling Docker container image, this could take a few minutes to complete...
+[Pterodactyl Daemon]: Finished pulling Docker container image
+v20.20.2
+:/home/container$ if [ -f /home/container/package.json ] && [ ! -d /home/container/node_modules ]; then [ -f /home/container/package-lock.json ] && /usr/local/bin/npm ci --no-audit --no-fund || /usr/local/bin/npm install --no-audit --no-fund; fi; /usr/local/bin/${CMD_START}
+container@pterodactyl~ Server marked as running...
+
+up to date in 546ms
+
+> anonymiketech@1.0.0 start
+> node --enable-source-maps ./dist/index.mjs
+[CLEANUP] Running cleanup job…
+file:///home/container/dist/index.mjs:20288
+          throw new PathError(`Missing parameter name at index ${index2}`, str);
+                ^
+PathError [TypeError]: Missing parameter name at index 1: *; visit https://git.new/pathToRegexpError for info
+    at name (file:///home/container/dist/index.mjs:20288:17)
+    at parse2 (file:///home/container/dist/index.mjs:20301:65)
+    at pathToRegexp (file:///home/container/dist/index.mjs:20448:58)
+    at Object.match (file:///home/container/dist/index.mjs:20413:32)
+    at matcher (file:///home/container/dist/index.mjs:20665:27)
+    at new Layer (file:///home/container/dist/index.mjs:20672:68)
+    at Function.route (file:///home/container/dist/index.mjs:21097:21)
+    at Function.route (file:///home/container/dist/index.mjs:21406:26)
+    at app2.<computed> [as get] (file:///home/container/dist/index.mjs:21469:26)
+    at file:///home/container/dist/index.mjs:62441:7 {
+  originalPath: '*'
+}
+Node.js v20.20.2
+
+container@pterodactyl~ Server marked as offline...
+[Pterodactyl Daemon]: ---------- Detected server process in a crashed state! ----------
+[Pterodactyl Daemon]: Exit code: 1
+[Pterodactyl Daemon]: Out of memory: false
+[Pterodactyl Daemon]: Updating process configuration files...
+[Pterodactyl Daemon]: Ensuring file permissions are set correctly, this could take a few seconds...
+container@pterodactyl~ Server marked as starting...
+[Pterodactyl Daemon]: Pulling Docker container image, this could take a few minutes to complete...
+[Pterodactyl Daemon]: Finished pulling Docker container image
+v20.20.2
+:/home/container$ if [ -f /home/container/package.json ] && [ ! -d /home/container/node_modules ]; then [ -f /home/container/package-lock.json ] && /usr/local/bin/npm ci --no-audit --no-fund || /usr/local/bin/npm install --no-audit --no-fund; fi; /usr/local/bin/${CMD_START}
+container@pterodactyl~ Server marked as running...
+
+up to date in 489ms
+
+> anonymiketech@1.0.0 start
+> node --enable-source-maps ./dist/index.mjs
+[CLEANUP] Running cleanup job…
+file:///home/container/dist/index.mjs:20288
+          throw new PathError(`Missing parameter name at index ${index2}`, str);
+                ^
+PathError [TypeError]: Missing parameter name at index 1: *; visit https://git.new/pathToRegexpError for info
+    at name (file:///home/container/dist/index.mjs:20288:17)
+    at parse2 (file:///home/container/dist/index.mjs:20301:65)
+    at pathToRegexp (file:///home/container/dist/index.mjs:20448:58)
+    at Object.match (file:///home/container/dist/index.mjs:20413:32)
+    at matcher (file:///home/container/dist/index.mjs:20665:27)
+    at new Layer (file:///home/container/dist/index.mjs:20672:68)
+    at Function.route (file:///home/container/dist/index.mjs:21097:21)
+    at Function.route (file:///home/container/dist/index.mjs:21406:26)
+    at app2.<computed> [as get] (file:///home/container/dist/index.mjs:21469:26)
+    at file:///home/container/dist/index.mjs:62441:7 {
+  originalPath: '*'
+}
+Node.js v20.20.2
+
+container@pterodactyl~ Server marked as offline...
+[Pterodactyl Daemon]: ---------- Detected server process in a crashed state! ----------
+[Pterodactyl Daemon]: Exit code: 1
+[Pterodactyl Daemon]: Out of memory: false
+[Pterodactyl Daemon]: Aborting automatic restart, last crash occurred less than 60 seconds ago.

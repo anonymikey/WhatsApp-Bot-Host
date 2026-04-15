@@ -47,8 +47,8 @@ if (process.env.SERVE_STATIC === "true") {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const publicDir = path.resolve(__dirname, "../public");
   app.use(express.static(publicDir));
-  // SPA fallback — return index.html for all non-API routes
-  app.get("*", (_req, res) => {
+  // SPA fallback — return index.html for all non-API routes (Express 5 wildcard)
+  app.get(/(.*)/, (_req, res) => {
     res.sendFile(path.join(publicDir, "index.html"));
   });
   logger.info({ publicDir }, "Serving static frontend from disk");
