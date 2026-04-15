@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Link, useLocation } from "wouter";
-import { Shield, Zap, ArrowRight, Server, Coins, Star, CheckCircle2, Users, Code2, Quote, GitBranch, Activity, Play } from "lucide-react";
+import { Shield, Zap, ArrowRight, Server, Coins, Star, CheckCircle2, Users, Code2, Quote, GitBranch, Activity, Play, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { DeployBotModal } from "@/components/bots/deploy-bot-modal";
 import { Footer } from "@/components/layout/footer";
 import { PartnerCTASection } from "@/components/layout/partner-cta-section";
 import logoImg from "@assets/WhatsApp_Image_2025-06-30_at_3.43.38_PM_1776199339550.jpeg";
+import collaboratorImg from "@assets/image_1776260401563.png";
 import { FEATURED_BOT, OTHER_BOTS, type BotDefinition } from "@/data/bots-catalog";
 
 const COIN_PACKAGES = [
@@ -578,7 +579,7 @@ export default function Landing() {
                 Loved by <span className="tech-gradient-text">developers in town</span>
               </h2>
               <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">
-                Real people, real bots, running 24/7 on our platform.
+                Trusted builders powering real bots on ANONYMIKETECH.
               </p>
             </div>
 
@@ -588,8 +589,6 @@ export default function Landing() {
                   name: "Samson Courtney",
                   handle: "@scourtney",
                   role: "Full-Stack Developer",
-                  avatar: null,
-                  initials: "SC",
                   gradient: "linear-gradient(135deg, #4f46e5, #9333ea)",
                   quote: "ANONYMIKETECH completely changed how I manage client WhatsApp automation. The coin system is genius — I only pay for what actually runs.",
                   stars: 5,
@@ -600,8 +599,6 @@ export default function Landing() {
                   name: "DevBot Pro",
                   handle: "@devbotpro",
                   role: "Bot Developer & Reseller",
-                  avatar: null,
-                  initials: "DB",
                   gradient: "linear-gradient(135deg, #0ea5e9, #06b6d4)",
                   quote: "Deployed 3 bots for my clients in under 10 minutes. The panel is rock-solid, no downtime in 60+ days. This is the real deal.",
                   stars: 5,
@@ -632,7 +629,7 @@ export default function Landing() {
                       className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black text-white flex-shrink-0"
                       style={{ background: t.gradient }}
                     >
-                      {t.initials}
+                      {t.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold truncate">{t.name}</p>
@@ -671,7 +668,7 @@ export default function Landing() {
                 Meet the <span className="tech-gradient-text">developers</span>
               </h2>
               <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">
-                The talented builders who trust ANONYMIKETECH to host and power their bots.
+                Main panel owner, collaborator, and bot builder spotlight.
               </p>
             </div>
 
@@ -690,75 +687,75 @@ export default function Landing() {
                   {/* Avatar */}
                   <div className="relative">
                     <img
-                      src="/samson-courtney.png"
-                      alt="Samson Courtney"
-                      className="w-20 h-20 rounded-2xl object-cover border-2 border-white/10 group-hover:border-purple-500/40 transition-colors"
+                      src={collaboratorImg}
+                      alt="Courtney"
+                      className="w-24 h-24 rounded-3xl object-cover border-2 border-white/10 group-hover:border-purple-500/40 transition-colors shadow-[0_0_30px_rgba(16,185,129,0.2)]"
                     />
                     <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-green-500 border-2 flex items-center justify-center" style={{ borderColor: "#0a0a0f" }}>
                       <CheckCircle2 className="w-3 h-3 text-white" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-display font-black">Samson Courtney</h3>
-                    <p className="text-sm text-muted-foreground">Collaborative Developer</p>
+                    <h3 className="text-lg font-display font-black">Courtney</h3>
+                    <p className="text-sm text-muted-foreground">Collaborator · Bot Developer</p>
                     <div className="flex items-center justify-center gap-1.5 mt-2">
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border" style={{ color: "#a78bfa", borderColor: "rgba(167,139,250,0.3)", background: "rgba(167,139,250,0.1)" }}>
-                        Partner Dev
+                        Collaborator
                       </span>
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border" style={{ color: "#00e599", borderColor: "rgba(0,229,153,0.3)", background: "rgba(0,229,153,0.1)" }}>
-                        Verified
+                        Bot Developer
                       </span>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Full-stack developer and WhatsApp bot architect. Builds powerful automation solutions on the ANONYMIKETECH platform.
+                    Courtney is the platform collaborator and bot developer. He helps shape the bot experience and build automation that runs smoothly for users.
                   </p>
                   <div className="flex items-center gap-3 w-full pt-3 border-t border-white/6">
                     <div className="flex-1 flex flex-col items-center">
                       <Code2 className="w-4 h-4 mb-1" style={{ color: "#a78bfa" }} />
-                      <span className="text-[10px] text-muted-foreground">Developer</span>
+                      <span className="text-[10px] text-muted-foreground">Collaborator</span>
                     </div>
                     <div className="w-px h-8 bg-white/8" />
                     <div className="flex-1 flex flex-col items-center">
                       <Activity className="w-4 h-4 mb-1" style={{ color: "#00e599" }} />
-                      <span className="text-[10px] text-muted-foreground">Active</span>
+                      <span className="text-[10px] text-muted-foreground">Bot Dev</span>
                     </div>
                     <div className="w-px h-8 bg-white/8" />
                     <div className="flex-1 flex flex-col items-center">
                       <Server className="w-4 h-4 mb-1" style={{ color: "#38bdf8" }} />
-                      <span className="text-[10px] text-muted-foreground">Hosting</span>
+                      <span className="text-[10px] text-muted-foreground">Platform</span>
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Placeholder second dev */}
+              {/* Main panel owner */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.42 }}
-                className="group relative rounded-2xl border border-dashed border-white/12 overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.01)" }}
+                className="group relative rounded-2xl border border-white/8 overflow-hidden"
+                style={{ background: "rgba(255,255,255,0.02)" }}
               >
-                <div className="h-1 w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
+                <div className="h-1 w-full" style={{ background: "linear-gradient(90deg, #00e599, #a78bfa, #38bdf8)" }} />
                 <div className="p-6 flex flex-col items-center text-center justify-center gap-4 min-h-[320px]">
-                  <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-white/15 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.02)" }}>
-                    <Users className="w-8 h-8 text-muted-foreground opacity-40" />
+                  <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-white/10 shadow-[0_0_30px_rgba(0,229,153,0.15)]">
+                    <img src={logoImg} alt="ANONYMIKETECH" className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h3 className="text-base font-display font-bold text-muted-foreground">Your Name Here</h3>
-                    <p className="text-sm text-muted-foreground/60 mt-1">Collaborative Developer Slot</p>
+                    <h3 className="text-base font-display font-bold">Main Dev</h3>
+                    <p className="text-sm text-muted-foreground/70 mt-1">Panel Owner · Product Lead</p>
                   </div>
-                  <p className="text-xs text-muted-foreground/50 leading-relaxed max-w-[200px]">
-                    Want to be featured as a trusted developer? Submit your bot through the Partner Program.
+                  <p className="text-xs text-muted-foreground/70 leading-relaxed max-w-[220px]">
+                    You lead the panel, product direction, and platform experience. Courtney is the collaborator and bot developer.
                   </p>
                   <Link
                     href="/partners?tab=developer"
                     className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-xs font-semibold hover:bg-white/5 transition-colors"
                     style={{ color: "#a78bfa" }}
                   >
-                    <Code2 className="w-3.5 h-3.5" />
-                    Apply as Developer
+                    <Crown className="w-3.5 h-3.5" />
+                    Main Panel Owner
                   </Link>
                 </div>
               </motion.div>
