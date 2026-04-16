@@ -263,186 +263,206 @@ async function issueVerificationCode(
 }
 
 router.post("/auth/email/register", async (req: Request, res: Response) => {
-  const { email, password, firstName, lastName } = req.body ?? {};
+  try {
+    const { email, password, firstName, lastName } = req.body ?? {};
 
-  if (!email || !password) {
-    res.status(400).json({ error: "Email and password are required" });
-    return;
-  }
-  if (typeof password !== "string" || password.length < 8) {
-    res.status(400).json({ error: "Password must be at least 8 characters" });
-    return;
-  }
-
-  const existing = await db.query.usersTable.findFirst({
-    where: eq(usersTable.email, email),
-  });
-  if (existing) {
-    if (!existing.emailVerified) {
-      const result = await issueVerificationCode(existing.id, email);
-      if (!result.cooldownSeconds) {
-        await sendVerificationEmail(email, result.code, existing.firstName, existing.profileImageUrl).catch(console.error);
-      }
-      res.status(409).json({ error: "Account exists but not verified. A new code has been sent.", needsVerification: true });
+    if (!email || !password) {
+      res.status(400).json({ error: "Email and password are required" });
       return;
     }
-    res.status(409).json({ error: "An account with this email already exists" });
-    return;
+    if (typeof password !== "string" || password.length < 8) {
+      res.status(400).json({ error: "Password must be at least 8 characters" });
+      return;
+    }
+
+    const existing = await db.query.usersTable.findFirst({
+      where: eq(usersTable.email, email),
+    });
+    if (existing) {
+      if (!existing.emailVerified) {
+        const result = await issueVerificationCode(existing.id, email);
+        if (!result.cooldownSeconds) {
+          await sendVerificationEmail(email, result.code, existing.firstName, existing.profileImageUrl).catch(console.error);
+        }
+        res.status(409).json({ error: "Account exists but not verified. A new code has been sent.", needsVerification: true });
+        return;
+      }
+      res.status(409).json({ error: "An account with this email already exists" });
+      return;
+    }
+
+    const passwordHash = await hashPassword(password);
+    const [user] = await db
+      .insert(usersTable)
+      .values({
+        email,
+        passwordHash,
+        firstName: firstName || null,
+        lastName: lastName || null,
+        coins: 100,
+        emailVerified: false,
+      })
+      .returning();
+
+    const result = await issueVerificationCode(user.id, email, true);
+    await sendVerificationEmail(email, result.code, firstName || null, null).catch(console.error);
+
+    res.json({ needsVerification: true });
+  } catch (err) {
+    console.error("[REGISTER]", err);
+    res.status(500).json({ error: "Registration failed. Please check your connection and try again." });
   }
-
-  const passwordHash = await hashPassword(password);
-  const [user] = await db
-    .insert(usersTable)
-    .values({
-      email,
-      passwordHash,
-      firstName: firstName || null,
-      lastName: lastName || null,
-      coins: 100,
-      emailVerified: false,
-    })
-    .returning();
-
-  const result = await issueVerificationCode(user.id, email, true);
-  await sendVerificationEmail(email, result.code, firstName || null, null).catch(console.error);
-
-  res.json({ needsVerification: true });
 });
 
 router.post("/auth/email/verify", async (req: Request, res: Response) => {
-  const { email, code } = req.body ?? {};
-  if (!email || !code) {
-    res.status(400).json({ error: "Email and code are required" });
-    return;
-  }
+  try {
+    const { email, code } = req.body ?? {};
+    if (!email || !code) {
+      res.status(400).json({ error: "Email and code are required" });
+      return;
+    }
 
-  const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.email, email),
-  });
-  if (!user) {
-    res.status(404).json({ error: "Account not found" });
-    return;
-  }
-
-  const record = await db.query.emailVerificationsTable.findFirst({
-    where: eq(emailVerificationsTable.userId, user.id),
-  });
-
-  if (!record) {
-    res.status(400).json({ error: "No verification code found. Please request a new one." });
-    return;
-  }
-  if (record.expiresAt < new Date()) {
-    await db.delete(emailVerificationsTable).where(eq(emailVerificationsTable.id, record.id));
-    res.status(400).json({ error: "Verification code has expired. Request a new one." });
-    return;
-  }
-  if (record.attempts >= MAX_ATTEMPTS) {
-    await db.delete(emailVerificationsTable).where(eq(emailVerificationsTable.id, record.id));
-    res.status(429).json({ error: "Too many attempts. Please request a new code." });
-    return;
-  }
-  if (record.code !== code.trim()) {
-    await db
-      .update(emailVerificationsTable)
-      .set({ attempts: record.attempts + 1 })
-      .where(eq(emailVerificationsTable.id, record.id));
-    const remaining = MAX_ATTEMPTS - (record.attempts + 1);
-    res.status(400).json({
-      error: remaining > 0
-        ? `Invalid code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`
-        : "Too many attempts. Please request a new code.",
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.email, email),
     });
-    return;
+    if (!user) {
+      res.status(404).json({ error: "Account not found" });
+      return;
+    }
+
+    const record = await db.query.emailVerificationsTable.findFirst({
+      where: eq(emailVerificationsTable.userId, user.id),
+    });
+
+    if (!record) {
+      res.status(400).json({ error: "No verification code found. Please request a new one." });
+      return;
+    }
+    if (record.expiresAt < new Date()) {
+      await db.delete(emailVerificationsTable).where(eq(emailVerificationsTable.id, record.id));
+      res.status(400).json({ error: "Verification code has expired. Request a new one." });
+      return;
+    }
+    if (record.attempts >= MAX_ATTEMPTS) {
+      await db.delete(emailVerificationsTable).where(eq(emailVerificationsTable.id, record.id));
+      res.status(429).json({ error: "Too many attempts. Please request a new code." });
+      return;
+    }
+    if (record.code !== code.trim()) {
+      await db
+        .update(emailVerificationsTable)
+        .set({ attempts: record.attempts + 1 })
+        .where(eq(emailVerificationsTable.id, record.id));
+      const remaining = MAX_ATTEMPTS - (record.attempts + 1);
+      res.status(400).json({
+        error: remaining > 0
+          ? `Invalid code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`
+          : "Too many attempts. Please request a new code.",
+      });
+      return;
+    }
+
+    await db
+      .update(usersTable)
+      .set({ emailVerified: true, lastActiveAt: new Date() })
+      .where(eq(usersTable.id, user.id));
+    await db.delete(emailVerificationsTable).where(eq(emailVerificationsTable.userId, user.id));
+
+    await createNotification(
+      user.id,
+      "success",
+      "Welcome to ANONYMIKETECH! 🎉",
+      "Your account is ready. You've received 100 free coins — deploy your first WhatsApp bot and go live in seconds!",
+      "/bots"
+    ).catch(console.error);
+
+    const sid = await buildSession(user);
+    setSessionCookie(res, sid);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[VERIFY]", err);
+    res.status(500).json({ error: "Verification failed. Please try again." });
   }
-
-  await db
-    .update(usersTable)
-    .set({ emailVerified: true, lastActiveAt: new Date() })
-    .where(eq(usersTable.id, user.id));
-  await db.delete(emailVerificationsTable).where(eq(emailVerificationsTable.userId, user.id));
-
-  await createNotification(
-    user.id,
-    "success",
-    "Welcome to ANONYMIKETECH! 🎉",
-    "Your account is ready. You've received 100 free coins — deploy your first WhatsApp bot and go live in seconds!",
-    "/bots"
-  );
-
-  const sid = await buildSession(user);
-  setSessionCookie(res, sid);
-  res.json({ success: true });
 });
 
 router.post("/auth/email/resend", async (req: Request, res: Response) => {
-  const { email } = req.body ?? {};
-  if (!email) {
-    res.status(400).json({ error: "Email is required" });
-    return;
-  }
+  try {
+    const { email } = req.body ?? {};
+    if (!email) {
+      res.status(400).json({ error: "Email is required" });
+      return;
+    }
 
-  const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.email, email),
-  });
-  if (!user) {
-    res.status(200).json({ success: true });
-    return;
-  }
-  if (user.emailVerified) {
-    res.status(400).json({ error: "This account is already verified" });
-    return;
-  }
-
-  const result = await issueVerificationCode(user.id, email);
-  if (result.cooldownSeconds) {
-    res.status(429).json({
-      error: `Please wait ${result.cooldownSeconds} seconds before requesting a new code.`,
-      cooldownSeconds: result.cooldownSeconds,
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.email, email),
     });
-    return;
+    if (!user) {
+      res.status(200).json({ success: true });
+      return;
+    }
+    if (user.emailVerified) {
+      res.status(400).json({ error: "This account is already verified" });
+      return;
+    }
+
+    const result = await issueVerificationCode(user.id, email);
+    if (result.cooldownSeconds) {
+      res.status(429).json({
+        error: `Please wait ${result.cooldownSeconds} seconds before requesting a new code.`,
+        cooldownSeconds: result.cooldownSeconds,
+      });
+      return;
+    }
+    await sendVerificationEmail(email, result.code, user.firstName, user.profileImageUrl).catch(console.error);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[RESEND]", err);
+    res.status(500).json({ error: "Failed to resend code. Please try again." });
   }
-  await sendVerificationEmail(email, result.code, user.firstName, user.profileImageUrl).catch(console.error);
-  res.json({ success: true });
 });
 
 router.post("/auth/email/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body ?? {};
+  try {
+    const { email, password } = req.body ?? {};
 
-  if (!email || !password) {
-    res.status(400).json({ error: "Email and password are required" });
-    return;
-  }
-
-  const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.email, email),
-  });
-
-  if (!user || !user.passwordHash) {
-    res.status(401).json({ error: "Invalid email or password" });
-    return;
-  }
-
-  const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) {
-    res.status(401).json({ error: "Invalid email or password" });
-    return;
-  }
-
-  if (!user.emailVerified) {
-    const result = await issueVerificationCode(user.id, email);
-    if (!result.cooldownSeconds) {
-      await sendVerificationEmail(email, result.code, user.firstName, user.profileImageUrl).catch(console.error);
+    if (!email || !password) {
+      res.status(400).json({ error: "Email and password are required" });
+      return;
     }
-    res.status(403).json({ error: "Please verify your email first. A new code has been sent.", needsVerification: true });
-    return;
-  }
 
-  await db.update(usersTable).set({ lastActiveAt: new Date() }).where(eq(usersTable.id, user.id));
-  await ensureWelcomeNotification(user.id);
-  const sid = await buildSession(user);
-  setSessionCookie(res, sid);
-  res.json({ success: true });
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.email, email),
+    });
+
+    if (!user || !user.passwordHash) {
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
+    }
+
+    const valid = await verifyPassword(password, user.passwordHash);
+    if (!valid) {
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
+    }
+
+    if (!user.emailVerified) {
+      const result = await issueVerificationCode(user.id, email);
+      if (!result.cooldownSeconds) {
+        await sendVerificationEmail(email, result.code, user.firstName, user.profileImageUrl).catch(console.error);
+      }
+      res.status(403).json({ error: "Please verify your email first. A new code has been sent.", needsVerification: true });
+      return;
+    }
+
+    await db.update(usersTable).set({ lastActiveAt: new Date() }).where(eq(usersTable.id, user.id));
+    await ensureWelcomeNotification(user.id).catch(console.error);
+    const sid = await buildSession(user);
+    setSessionCookie(res, sid);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("[LOGIN]", err);
+    res.status(500).json({ error: "Login failed. Please check your connection and try again." });
+  }
 });
 
 // ─── GitHub OAuth ─────────────────────────────────────────────────────────────
