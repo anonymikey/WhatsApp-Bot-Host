@@ -19,7 +19,7 @@ export interface BotDefinition {
 export const BOT_CATALOG: BotDefinition[] = [
   {
     id: "truth",
-    name: "TRUTH",
+    name: "TRUTH MD",
     tagline: "The Official AnonymikeTech Bot",
     description:
       "The flagship WhatsApp automation bot — built and maintained by AnonymikeTech. Battle-tested, always-on, and packed with the most complete feature set on the platform.",
@@ -197,30 +197,6 @@ export const BOT_CATALOG: BotDefinition[] = [
     docsUrl: "https://github.com/kkeizza/Keith",
     githubRepo: "https://github.com/kkeizza/Keith",
     category: "media",
-  },
-  {
-    id: "truth-md",
-    name: "Truth MD Bot",
-    tagline: "Smart multi-device bot by Courtney Tech",
-    description:
-      "A powerful and reliable WhatsApp multi-device bot by Courtney Tech. Packed with smart auto-replies, group admin tools, and seamless media capabilities.",
-    featured: false,
-    accent: "#818cf8",
-    accentBg: "rgba(129,140,248,0.08)",
-    coinsPerDay: 30,
-    badge: "New",
-    features: [
-      "Smart auto-replies & AI chat",
-      "Group management & anti-spam",
-      "Media downloads & stickers",
-      "Custom commands & prefix",
-      "Baileys multi-device",
-    ],
-    sessionLink: "https://truth-md.courtneytech.xyz/",
-    docsUrl: "https://github.com/Courtney250/TRUTH-MD",
-    githubRepo: "https://github.com/Courtney250/TRUTH-MD",
-    category: "ai",
-    pterodactylServerId: "dad7fc6f",
   },
 ];
 

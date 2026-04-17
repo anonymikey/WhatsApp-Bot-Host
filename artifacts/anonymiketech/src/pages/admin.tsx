@@ -340,6 +340,44 @@ export default function AdminPage() {
   const [panelActionResult, setPanelActionResult] = useState<{ id: string; success: boolean; msg: string } | null>(null);
   const [suspendLoading, setSuspendLoading] = useState<string | null>(null);
 
+  // User Grant
+  const [grantTarget, setGrantTarget] = useState<{ id: string; email: string | null; firstName: string | null } | null>(null);
+  const [grantCoins, setGrantCoins] = useState("");
+  const [grantDays, setGrantDays] = useState("");
+  const [grantReason, setGrantReason] = useState("");
+  const [grantLoading, setGrantLoading] = useState(false);
+  const [grantResult, setGrantResult] = useState<{ success: boolean; msg: string } | null>(null);
+
+  const submitGrant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!grantTarget) return;
+    const coins = parseInt(grantCoins) || 0;
+    const days = parseInt(grantDays) || 0;
+    if (coins <= 0 && days <= 0) return;
+    setGrantLoading(true);
+    setGrantResult(null);
+    try {
+      const res = await fetch(`/api/admin/users/${grantTarget.id}/grant`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coins: coins || undefined, days: days || undefined, reason: grantReason || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setGrantResult({ success: true, msg: `Granted: ${[coins > 0 ? `+${coins} coins` : null, days > 0 ? `+${days} days` : null].filter(Boolean).join(", ")}` });
+        setGrantCoins(""); setGrantDays(""); setGrantReason("");
+        setTimeout(() => { setGrantTarget(null); setGrantResult(null); }, 2500);
+      } else {
+        setGrantResult({ success: false, msg: data.error ?? "Failed" });
+      }
+    } catch {
+      setGrantResult({ success: false, msg: "Network error" });
+    } finally {
+      setGrantLoading(false);
+    }
+  };
+
   // Bot Catalog Management
   type BotSetting = {
     botTypeId: string;
@@ -835,6 +873,7 @@ export default function AdminPage() {
                     <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground hidden sm:table-cell">Email</th>
                     <th className="text-center px-4 py-2.5 text-xs font-semibold text-muted-foreground">Coins</th>
                     <th className="text-right px-5 py-2.5 text-xs font-semibold text-muted-foreground hidden md:table-cell">Joined</th>
+                    <th className="text-center px-4 py-2.5 text-xs font-semibold text-muted-foreground">Grant</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -849,6 +888,14 @@ export default function AdminPage() {
                       <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell truncate max-w-[160px]">{u.email ?? "—"}</td>
                       <td className="px-4 py-3 text-center font-mono font-bold text-xs" style={{ color: "#00e599" }}>{u.coins}</td>
                       <td className="px-5 py-3 text-right text-xs text-muted-foreground hidden md:table-cell">{timeAgo(u.createdAt)}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => { setGrantTarget({ id: u.id, email: u.email, firstName: u.firstName }); setGrantResult(null); setGrantCoins(""); setGrantDays(""); setGrantReason(""); }}
+                          className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          Grant
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -856,6 +903,101 @@ export default function AdminPage() {
             </div>
           </motion.div>
         )}
+
+        {/* ── Grant Modal ── */}
+        <AnimatePresence>
+          {grantTarget && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+              onClick={(e) => { if (e.target === e.currentTarget) setGrantTarget(null); }}
+            >
+              <motion.div
+                initial={{ scale: 0.94, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.94, opacity: 0 }}
+                className="w-full max-w-md rounded-2xl border border-white/10 bg-[#111113] p-6 shadow-2xl"
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <h3 className="font-bold text-base">Grant Allocation</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {grantTarget.firstName ?? grantTarget.email ?? grantTarget.id}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setGrantTarget(null)}
+                    className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+                <form onSubmit={submitGrant} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Bonus Coins</label>
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="e.g. 500"
+                        value={grantCoins}
+                        onChange={(e) => setGrantCoins(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Extra Days</label>
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="e.g. 7"
+                        value={grantDays}
+                        onChange={(e) => setGrantDays(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Reason (optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Loyalty discount"
+                      value={grantReason}
+                      onChange={(e) => setGrantReason(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                  <AnimatePresence>
+                    {grantResult && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className={`flex items-center gap-2 text-xs font-semibold px-3 py-2 rounded-xl ${grantResult.success ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-red-500/10 text-red-400 border border-red-500/20"}`}
+                      >
+                        {grantResult.success ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                        {grantResult.msg}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <button
+                    type="submit"
+                    disabled={grantLoading || ((parseInt(grantCoins) || 0) <= 0 && (parseInt(grantDays) || 0) <= 0)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm text-black transition-all disabled:opacity-50"
+                    style={{ background: "#00e599" }}
+                  >
+                    {grantLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Send Grant & Notify User
+                  </button>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ── Bot Catalog Management ── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}

@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { usersTable, notificationsTable, settingsTable, botsTable } from "@workspace/db/schema";
-import { eq, desc, count, and } from "drizzle-orm";
+import { eq, desc, count, and, isNotNull } from "drizzle-orm";
 import { pterodactyl } from "../services/pterodactyl";
+import { sendGrantEmail } from "../lib/email";
 
 const router = Router();
 
@@ -176,6 +177,69 @@ router.post("/pterodactyl/power", async (req, res) => {
   } catch (err: any) {
     return res.status(502).json({ error: err?.message ?? "Failed to send power signal" });
   }
+});
+
+// Grant coins and/or extra subscription days to a user — admin only
+router.post("/admin/users/:id/grant", async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: "Forbidden" });
+  const { id } = req.params;
+  const { coins, days, reason } = req.body as { coins?: number; days?: number; reason?: string };
+
+  if ((!coins || coins <= 0) && (!days || days <= 0)) {
+    return res.status(400).json({ error: "Provide coins > 0 or days > 0" });
+  }
+
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  if (coins && coins > 0) {
+    await db
+      .update(usersTable)
+      .set({ coins: user.coins + coins })
+      .where(eq(usersTable.id, id));
+  }
+
+  if (days && days > 0) {
+    const userBots = await db
+      .select()
+      .from(botsTable)
+      .where(and(eq(botsTable.userId, id), isNotNull(botsTable.expiresAt)));
+
+    for (const bot of userBots) {
+      if (!bot.expiresAt) continue;
+      const base = bot.expiresAt > new Date() ? bot.expiresAt : new Date();
+      const extended = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
+      await db.update(botsTable).set({ expiresAt: extended }).where(eq(botsTable.id, bot.id));
+    }
+  }
+
+  const parts: string[] = [];
+  if (coins && coins > 0) parts.push(`+${coins} coins`);
+  if (days && days > 0) parts.push(`+${days} day${days === 1 ? "" : "s"} on your subscription`);
+  const notifMsg = [
+    parts.join(" and ") + " have been granted to your account.",
+    reason ? `Reason: ${reason}` : "",
+  ].filter(Boolean).join(" ");
+
+  await db.insert(notificationsTable).values({
+    userId: id,
+    type: "success",
+    title: "🎁 Special allocation from ANONYMIKETECH",
+    message: notifMsg,
+    link: "/dashboard",
+  });
+
+  if (user.email) {
+    sendGrantEmail({
+      to: user.email,
+      firstName: user.firstName,
+      coins: coins && coins > 0 ? coins : undefined,
+      days: days && days > 0 ? days : undefined,
+      reason: reason || null,
+    }).catch(console.error);
+  }
+
+  return res.json({ success: true, userId: id, coins: coins ?? 0, days: days ?? 0 });
 });
 
 // Suspend or unsuspend a deployed bot instance — admin only

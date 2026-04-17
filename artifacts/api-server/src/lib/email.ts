@@ -276,3 +276,71 @@ export async function sendWarningEmail(
     text: `Hi${displayName},\n\nYour ANONYMIKETECH account has been inactive for 14 days.\n\nIt will be permanently deleted in 2 days if you don't log in.\n\nLog in now: https://bots.anonymiketech.online/dashboard\n\nIf you no longer need this account, no action is required.`,
   });
 }
+
+export async function sendGrantEmail(opts: {
+  to: string;
+  firstName?: string | null;
+  coins?: number;
+  days?: number;
+  reason?: string | null;
+}): Promise<void> {
+  const client = getClient();
+  const { to, firstName, coins, days, reason } = opts;
+  const displayName = firstName ? ` ${firstName}` : "";
+
+  const perks: string[] = [];
+  if (coins && coins > 0) perks.push(`<b style="color:#00e599;">+${coins} coins</b> added to your wallet`);
+  if (days && days > 0) perks.push(`<b style="color:#22d3ee;">+${days} day${days === 1 ? "" : "s"}</b> extended on your active bot${days === 1 ? "" : "s"}`);
+
+  const body = `
+    <h1 style="margin:0 0 6px;font-size:22px;font-weight:900;color:#f4f4f5;letter-spacing:-0.02em;">
+      🎁 You've received a special allocation!
+    </h1>
+    <p style="margin:0 0 20px;font-size:14px;color:#a1a1aa;line-height:1.6;">
+      Hi${displayName}, the ANONYMIKETECH team has sent you a personal allocation.
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+      style="background:rgba(0,229,153,0.06);border:1px solid rgba(0,229,153,0.2);border-radius:14px;margin-bottom:20px;">
+      <tr>
+        <td style="padding:18px 20px;">
+          <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#00e599;text-transform:uppercase;">Your allocation</p>
+          ${perks.map((p) => `<p style="margin:0 0 6px;font-size:14px;color:#e4e4e7;line-height:1.5;">✅ ${p}</p>`).join("")}
+          ${reason ? `<p style="margin:10px 0 0;font-size:12px;color:#71717a;line-height:1.6;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;">Reason: ${reason}</p>` : ""}
+        </td>
+      </tr>
+    </table>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 20px;">
+      <tr>
+        <td align="center" style="border-radius:12px;background:#00e599;">
+          <a href="https://bots.anonymiketech.online/dashboard"
+            style="display:inline-block;padding:13px 40px;font-size:14px;font-weight:800;color:#000000;text-decoration:none;border-radius:12px;letter-spacing:0.01em;">
+            View Dashboard →
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0;font-size:11px;color:#52525b;line-height:1.6;">
+      This allocation was granted manually by the ANONYMIKETECH team. No action is required on your part.
+    </p>`;
+
+  if (!client) {
+    console.log(`[EMAIL] No RESEND_API_KEY — grant email would be sent to ${to}`);
+    return;
+  }
+
+  const parts: string[] = [];
+  if (coins && coins > 0) parts.push(`+${coins} coins`);
+  if (days && days > 0) parts.push(`+${days} day${days === 1 ? "" : "s"} subscription`);
+
+  await client.emails.send({
+    from: DEVS,
+    reply_to: "devs@anonymiketech.online",
+    to,
+    subject: `🎁 You've received ${parts.join(" & ")} on ANONYMIKETECH`,
+    html: shell(body),
+    text: `Hi${displayName},\n\nThe ANONYMIKETECH team has granted you: ${parts.join(", ")}.\n${reason ? `Reason: ${reason}\n` : ""}\nView your dashboard: https://bots.anonymiketech.online/dashboard`,
+  });
+}
